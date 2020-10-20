@@ -39,9 +39,7 @@ async function game(symbolSpaceLength: number, solutionLength: number) {
   console.log("Solving...");
 
   do {
-    console.time("Making a guess");
     const guess = makeEducatedGuess(turns, solutionSpace);
-    console.timeEnd("Making a guess");
 
     bulls = guess.length - bullsDistance(solution, guess);
     cows = guess.length - cowsDistance(new Set(guess), new Set(solution));
@@ -77,5 +75,5 @@ async function game(symbolSpaceLength: number, solutionLength: number) {
 }
 
 const d = 10;
-const n = 6;
+const n = 4;
 game(d, n);
