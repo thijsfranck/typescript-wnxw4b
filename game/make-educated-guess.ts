@@ -10,15 +10,25 @@ export function makeEducatedGuess(
   turns: Iterable<Turn>,
   solutionSpace: Iterable<string>
 ) {
-  let symbolWeight = new DefaultMap<string, number>(() => 0);
+  const symbolWeight = weighSymbols(turns);
+  return makeGuess(symbolWeight, solutionSpace);
+}
 
+function weighSymbols(turns: Iterable<Turn>) {
+  const symbolWeight = new DefaultMap<string, number>(() => 0);
   for (const { bulls, cows, guess } of turns) {
     for (const key of guess) {
       const currentWeight = symbolWeight.get(key);
       symbolWeight.set(key, currentWeight + bulls + cows);
     }
   }
+  return symbolWeight;
+}
 
+function makeGuess(
+  symbolWeight: DefaultMap<string, number>,
+  solutionSpace: Iterable<string>
+) {
   let alternatives = [];
   let maxScore = null;
   for (const solution of solutionSpace) {
