@@ -41,10 +41,8 @@ function makeGuess(
   for (const solution of solutionSpace) {
     let solutionScore = 0;
 
-    for (const [key, index] of enumerate(solution)) {
-      const bullsWeightMap = bullsWeight.get(key);
-      solutionScore -= cowsWeight.get(key) + bullsWeightMap.get(index);
-    }
+    for (const [key, index] of enumerate(solution))
+      solutionScore -= cowsWeight.get(key) + bullsWeight.get(key).get(index);
 
     if (solutionScore === maxScore) alternatives.push(solution);
 
@@ -54,7 +52,6 @@ function makeGuess(
     }
   }
 
-  console.log(alternatives.length);
   const guess = Math.floor(Math.random() * alternatives.length);
 
   return alternatives[guess];
