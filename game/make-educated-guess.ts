@@ -29,8 +29,8 @@ function makeGuess(
   symbolWeight: DefaultMap<string, number>,
   solutionSpace: Iterable<string>
 ) {
-  let alternatives = [];
-  let maxScore = null;
+  let alternatives = [],
+    maxScore = null;
   for (const solution of solutionSpace) {
     let solutionScore = 0;
 
