@@ -1,4 +1,5 @@
 import DefaultMap from "mnemonist/default-map";
+import { enumerate } from "../utils";
 
 export interface Turn {
   readonly guess: string;
@@ -10,23 +11,29 @@ export function makeEducatedGuess(
   turns: Iterable<Turn>,
   solutionSpace: Iterable<string>
 ) {
-  const symbolWeight = weighSymbols(turns);
-  return makeGuess(symbolWeight, solutionSpace);
+  const [bullsWeight, cowsWeight] = weighSymbols(turns);
+  return makeGuess(bullsWeight, cowsWeight, solutionSpace);
 }
 
 function weighSymbols(turns: Iterable<Turn>) {
-  const symbolWeight = new DefaultMap<string, number>(() => 0);
+  const bullsWeight = new DefaultMap<string, DefaultMap<number, number>>(
+    () => new DefaultMap(() => 0)
+  );
+  const cowsWeight = new DefaultMap<string, number>(() => 0);
+
   for (const { bulls, cows, guess } of turns) {
-    for (const key of guess) {
-      const currentWeight = symbolWeight.get(key);
-      symbolWeight.set(key, currentWeight + bulls + cows);
+    for (const [key, index] of enumerate(guess)) {
+      const bullsWeightMap = bullsWeight.get(key);
+      bullsWeightMap.set(index, bullsWeightMap.get(index) + bulls);
+      cowsWeight.set(key, cowsWeight.get(key) + cows);
     }
   }
-  return symbolWeight;
+  return [bullsWeight, cowsWeight] as const;
 }
 
 function makeGuess(
-  symbolWeight: DefaultMap<string, number>,
+  bullsWeight: DefaultMap<string, DefaultMap<number, number>>,
+  cowsWeight: DefaultMap<string, number>,
   solutionSpace: Iterable<string>
 ) {
   let alternatives = [],
@@ -34,7 +41,10 @@ function makeGuess(
   for (const solution of solutionSpace) {
     let solutionScore = 0;
 
-    for (const key of solution) solutionScore -= symbolWeight.get(key);
+    for (const [key, index] of enumerate(solution)) {
+      const bullsWeightMap = bullsWeight.get(key);
+      solutionScore -= cowsWeight.get(key) + bullsWeightMap.get(index);
+    }
 
     if (solutionScore === maxScore) alternatives.push(solution);
 
@@ -44,6 +54,7 @@ function makeGuess(
     }
   }
 
+  console.log(alternatives.length);
   const guess = Math.floor(Math.random() * alternatives.length);
 
   return alternatives[guess];
