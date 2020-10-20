@@ -8,7 +8,7 @@ export interface Turn {
 
 export function makeEducatedGuess(
   turns: Iterable<Turn>,
-  solutionSpace: Set<string>
+  solutionSpace: Iterable<string>
 ) {
   let symbolWeight = new DefaultMap<string, number>(() => 0);
 
